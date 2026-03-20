@@ -1,15 +1,30 @@
-name: Pygbag Web Build
-on: [push]
+name: Deploy Pygame to Web
+on:
+  push:
+    branches: [ main ] # 如果你的主分支叫 master，请改为 master
+
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Pygbag
+        run: pip install pygbag
+
       - name: Build Web Version
         run: |
-          pip install pygbag
+          # 这一步会将你的 Python 编译为 WebAssembly
           pygbag --build $GITHUB_WORKSPACE/main.py
+
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: build/web
+          folder: build/web # Pygbag 默认生成的网页文件夹
+          branch: gh-pages # 部署到这个分支
